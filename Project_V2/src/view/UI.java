@@ -27,6 +27,7 @@ public class UI {
      * Metoda care ruleaza aplicatia
      */
     public void run() {
+        //comentariu pt proiect
         System.out.println("Bine ati venit!");
         System.out.println("Take Home Assignment -> 3. ");
         System.out.println("ADD STUDENT");
