@@ -119,7 +119,10 @@ public class UI {
         scanner.nextLine();
         String numeStudent = scanner.nextLine();
         System.out.print("Introduceti grupa: ");
+        if(!scanner.hasNextInt())
+            throw new ValidationException("Input invalid! Introduceti un numar pentru grupa.");
         int grupa = scanner.nextInt();
+
         System.out.print("Introduceti email: ");
         String email = scanner.next();
         Student student = new Student(idStudent, numeStudent, grupa, email);
