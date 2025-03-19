@@ -295,8 +295,9 @@ public class UI {
             descriere = scanner.nextLine().trim();
             if (!descriere.isEmpty()) {
                 break;
-            } else {
-                System.out.println("Descrierea nu poate fi goala! Incercati din nou.");
+            }
+            else {
+                System.out.println("The description must not be empty!");
             }
         }
 
