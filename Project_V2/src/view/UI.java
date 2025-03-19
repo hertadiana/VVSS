@@ -6,8 +6,10 @@ import domain.Tema;
 import service.Service;
 import validation.ValidationException;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 /**
  * Interfata utilizator de tip consola
@@ -24,17 +26,11 @@ public class UI {
     }
 
     /**
+     *
      * Metoda care ruleaza aplicatia
      */
     public void run() {
         System.out.println("Bine ati venit!");
-        System.out.println("Take Home Assignment -> 3. ");
-        System.out.println("ADD STUDENT");
-        adaugaStudent();
-        System.out.println("ADD LAB ASSIGNMENT");
-        adaugaTema();
-        System.out.println("ADD GRADE TOO A STUDENT AT A GIVEN LAB ASSIGNMENT");
-        adaugaNota();
 
         while (true) {
             try {
@@ -108,29 +104,66 @@ public class UI {
      * Adauga un student
      * @throws ValidationException daca datele studentul exista deja
      */
-    private void adaugaStudent() throws ValidationException {
+    private void adaugaStudent() {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Introduceti id student: ");
-        String idStudent = scanner.next();
-        if (service.findStudent(idStudent) != null) {
-            throw new ValidationException("Studentul exista!");
-        }
-        System.out.print("Introduceti numele: ");
-        scanner.nextLine();
-        String numeStudent = scanner.nextLine();
-        System.out.print("Introduceti grupa: ");
-        if(!scanner.hasNextInt())
-            throw new ValidationException("Input invalid! Introduceti un numar pentru grupa.");
-        int grupa = scanner.nextInt();
+        String idStudent;
 
-        System.out.print("Introduceti email: ");
-        String email = scanner.next();
+        while (true) {
+            System.out.print("Introduceti id student: ");
+            idStudent = scanner.next();
+            if (service.findStudent(idStudent) != null) {
+                System.out.println("Studentul exista! Incercati din nou.");
+            } else {
+                break;
+            }
+        }
+
+        scanner.nextLine();
+
+        String numeStudent;
+        while (true) {
+            System.out.print("Introduceti numele: ");
+            numeStudent = scanner.nextLine().trim();
+            if (!numeStudent.isEmpty()) {
+                break;
+            } else {
+                System.out.println("Numele nu poate fi gol! Incercati din nou.");
+            }
+        }
+
+        int grupa;
+        while (true) {
+            System.out.print("Introduceti grupa: ");
+            if (scanner.hasNextInt()) {
+                grupa = scanner.nextInt();
+                break;
+            } else {
+                System.out.println("Input invalid! Introduceti un numar pentru grupa.");
+                scanner.next();
+            }
+        }
+
+        scanner.nextLine();
+
+        String email;
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        while (true) {
+            System.out.print("Introduceti email: ");
+            email = scanner.next();
+            if (Pattern.matches(emailRegex, email)) {
+                break;
+            } else {
+                System.out.println("Format email invalid! Introduceti un email valid.");
+            }
+        }
+
         Student student = new Student(idStudent, numeStudent, grupa, email);
         Student student1 = service.addStudent(student);
+
         if (student1 == null) {
             System.out.println("Student adaugat cu succes!");
         } else {
-            System.out.println("Studentul deja exista" + student1);
+            System.out.println("Studentul deja exista: " + student1);
         }
     }
 
@@ -239,28 +272,83 @@ public class UI {
      * Adauga o tema
      * @throws ValidationException daca tema exista deja
      */
-    private void adaugaTema() throws ValidationException{
+
+    private void adaugaTema() throws ValidationException {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Introduceti nr tema: ");
-        String nrTema = scanner.next();
-        if (service.findTema(nrTema) != null) {
-            throw new ValidationException("Tema exista deja!");
+        String nrTema;
+
+        while (true) {
+            System.out.print("Introduceti nr tema: ");
+            nrTema = scanner.next();
+            if (service.findTema(nrTema) != null) {
+                System.out.println("Tema exista deja! Incercati din nou.");
+            } else {
+                break;
+            }
         }
-        System.out.print("Introduceti descrierea: ");
+
         scanner.nextLine();
-        String descriere = scanner.nextLine();
-        System.out.print("Introduceti deadline-ul(nr saptamanii): ");
-        int deadline = scanner.nextInt();
-        System.out.print("Introduceti saptamana primirii: ");
-        int primire = scanner.nextInt();
+
+        String descriere;
+        while (true) {
+            System.out.print("Introduceti descrierea: ");
+            descriere = scanner.nextLine().trim();
+            if (!descriere.isEmpty()) {
+                break;
+            }
+            else {
+                System.out.println("The description must not be empty!");
+            }
+        }
+
+        int deadline;
+        while (true) {
+            System.out.print("Introduceti deadline-ul (nr saptamanii): ");
+            if (scanner.hasNextInt()) {
+                deadline = scanner.nextInt();
+                if (deadline >= 1 && deadline <= 14) {
+                    break;
+                }
+               else {
+                   System.out.println("The deadline value must be between 1 and 14!");
+                }
+
+            } else {
+                System.out.println("Input invalid! Introduceti un numar valid pentru deadline.");
+                scanner.next();
+            }
+        }
+
+        int primire;
+        while (true) {
+            System.out.print("Introduceti saptamana primirii: ");
+            if (scanner.hasNextInt()) {
+                primire = scanner.nextInt();
+                if (primire >= 1 && primire <= 14) {
+                    if (primire <= deadline) {
+                        break;
+                    } else {
+                        System.out.println("Saptamana primirii trebuie sa fie inainte de deadline! Incercati din nou.");
+                    }
+                } else {
+                    System.out.println("Saptamana primirii invalida! Introduceti un numar intre 1 si 14.");
+                }
+            } else {
+                System.out.println("Input invalid! Introduceti un numar valid pentru saptamana primirii.");
+                scanner.next(); // Clear invalid input
+            }
+        }
+
         Tema tema = new Tema(nrTema, descriere, deadline, primire);
         tema = service.addTema(tema);
+
         if (tema == null) {
             System.out.println("Tema adaugata cu succes!");
         } else {
-            System.out.println("Tema deja exista" + tema);
+            System.out.println("Tema deja exista: " + tema);
         }
     }
+
 
 
     /**
@@ -376,25 +464,77 @@ public class UI {
      */
     private void adaugaNota() throws ValidationException {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Introduceti id student: ");
-        String idStudent = scanner.next();
-        System.out.print("Introduceti numarul temei: ");
-        String nrTema = scanner.next();
+        String idStudent, nrTema;
+
+        while (true) {
+            System.out.print("Introduceti id student: ");
+            idStudent = scanner.next();
+            if (!idStudent.isEmpty()) {
+                break;
+            } else {
+                System.out.println("ID-ul studentului nu poate fi gol! Incercati din nou.");
+            }
+        }
+
+        while (true) {
+            System.out.print("Introduceti numarul temei: ");
+            nrTema = scanner.next();
+            if (!nrTema.isEmpty()) {
+                break;
+            } else {
+                System.out.println("Numarul temei nu poate fi gol! Incercati din nou.");
+            }
+        }
+
         String idNota = idStudent + "#" + nrTema;
         if (service.findNota(idNota) != null) {
             throw new ValidationException("Nota exista deja!");
         }
-        System.out.print("Introduceti nota: ");
-        Double nota = scanner.nextDouble();
-        System.out.print("Introduceti data predarii temei(format: an-luna-data): ");
-        String data = scanner.next();
-        String[] date = data.split("-");
-        LocalDate dataPredare = LocalDate.of(Integer.parseInt(date[0]), Integer.parseInt(date[1]), Integer.parseInt(date[2]));
-        System.out.print("Introduceti feedback: ");
+
+        double nota;
+        while (true) {
+            System.out.print("Introduceti nota: ");
+            if (scanner.hasNextDouble()) {
+                nota = scanner.nextDouble();
+                if (nota >= 1 && nota <= 10) {
+                    break;
+                } else {
+                    System.out.println("Nota invalida! Introduceti o valoare intre 1 si 10.");
+                }
+            } else {
+                System.out.println("Input invalid! Introduceti o valoare numerica pentru nota.");
+                scanner.next();
+            }
+        }
+
+        LocalDate dataPredare;
+        while (true) {
+            System.out.print("Introduceti data predarii temei (format: YYYY-MM-DD): ");
+            String data = scanner.next();
+            try {
+                dataPredare = LocalDate.parse(data);
+                break;
+            } catch (DateTimeParseException e) {
+                System.out.println("Data introdusa este invalida! Folositi formatul corect (YYYY-MM-DD).");
+            }
+        }
+
         scanner.nextLine();
-        String feedback = scanner.nextLine();        //System.out.println(feedback);
+
+        String feedback;
+        while (true) {
+            System.out.print("Introduceti feedback: ");
+            feedback = scanner.nextLine().trim();
+            if (!feedback.isEmpty()) {
+                break;
+            } else {
+                System.out.println("Feedback-ul nu poate fi gol! Incercati din nou.");
+            }
+        }
+
         Nota notaCatalog = new Nota(idNota, idStudent, nrTema, nota, dataPredare);
         double notaFinala = service.addNota(notaCatalog, feedback);
+
         System.out.println("Nota maxima pe care o poate primi studentul este: " + notaFinala);
     }
 
