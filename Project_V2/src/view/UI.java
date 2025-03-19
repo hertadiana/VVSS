@@ -308,8 +308,7 @@ public class UI {
                 if (deadline >= 1 && deadline <= 14) {
                     break;
                 }
-                else
-                {
+                else {
                     System.out.println("The deadline must be between 1 and 14!");
                 }
 
