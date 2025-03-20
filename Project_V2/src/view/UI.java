@@ -560,7 +560,16 @@ public class UI {
         System.out.print("Introduceti id-ul studentului: ");
         String idStudent = scanner.next();
         System.out.print("Introduceti nr-ul temei: ");
-        String nrTema = scanner.next();
+        int nrTema;
+        while (true) {
+            if (scanner.hasNextInt()) {
+                nrTema = scanner.nextInt();
+                break;
+            } else {
+                System.out.println("Input invalid! Introduceti un numar valid pentru deadline.");
+                scanner.next();
+            }
+        }
         String idNota = idStudent + "#" + nrTema;
         Nota nota = service.deleteNota(idNota);
         if (nota == null) {
