@@ -335,7 +335,7 @@ public class UI {
                 }
             } else {
                 System.out.println("Input invalid! Introduceti un numar valid pentru saptamana primirii.");
-                scanner.next();
+                scanner.next(); // Clear invalid input
             }
         }
 
@@ -359,21 +359,7 @@ public class UI {
         System.out.print("Introduceti id tema: ");
         String nrTema = scanner.next();
         System.out.print("Introduceti deadline nou: ");
-        int deadline;
-        while (true) {
-            if (scanner.hasNextInt()) {
-                deadline = scanner.nextInt();
-                if (deadline >= 1 && deadline <= 14) {
-                    break;
-                } else {
-                    System.out.println("The deadline value must be between 1 and 14!");
-                }
-
-            } else {
-                System.out.println("Input invalid! Introduceti un numar valid pentru deadline.");
-                scanner.next();
-            }
-        }
+        int deadline = scanner.nextInt();
         service.prelungireDeadline(nrTema, deadline);
         System.out.println("Dealine prelungit!");
     }
